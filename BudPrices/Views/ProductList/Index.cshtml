@@ -1,0 +1,42 @@
+﻿@{
+	ViewBag.Title = "Index";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model Prices.Helper.External.Models.Products
+
+<form id="budSearch">
+	<div>
+		<h6>Search by Strain</h6>
+		<input id="strainQuery" type="text" name="strainQuery" placeholder="strain" /><br />
+		<input id="btnPriceSearch" type="submit" onclick="submitStrainForPriceSearch(strainQuery); return false;" value="find prices" /><br />
+		<input id="radioConcentrate" type="radio" name="budType" value="concentrate" />concentrate<br />
+		<input id="radioEdible" type="radio" name="budType" value="edible" />edible<br />
+		<input id="radioFlower" type="radio" name="budType" value="flower" />flower<br />
+		<input id="radioOther" type="radio" name="budType" value="other" />other<br />
+	</div>
+	<div>
+	</div>
+</form>
+<div id="results">
+
+</div>
+
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script>
+	function submitStrainForPriceSearch(strainId) {
+		var strainId = $("#strainQuery").val();
+		var type = $("input:radio[name=budType]:checked").val();
+		$.ajax({
+			url: "/ProductList/AveragePrice/" + strainId + "/" + type,
+			type: "GET",
+			dataType: 'text',
+			success: function (data) {
+				console.log("success");
+				console.log(data);
+				var results;
+				results += JSON.stringify(data);
+				$('#results').append(results);
+			}
+		})
+	}
+</script>
