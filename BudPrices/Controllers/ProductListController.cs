@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using Prices.Helper;
-using Prices.Helper.External.Models;
 using System.Xml;
 using System.IO;
 using System.Data;
 using Newtonsoft.Json;
-using System.Web.Script.Serialization;
-//using BudPrices.Models;
+using BudPrices.Models;
 
 namespace BudPrices.Controllers
 {
@@ -344,19 +340,5 @@ namespace BudPrices.Controllers
 
 			return modePrices;
 		}   // GeneratePriceMode(IEnumerable<Products>)
-	}
-
-	public class Product
-	{
-		public string date;
-		public double price;
-		public string quantity;
-
-		public Product(string quantity, string date, double price)
-		{
-			this.quantity = quantity;
-			this.date = date;
-			this.price = price;
-		}
 	}
 }
