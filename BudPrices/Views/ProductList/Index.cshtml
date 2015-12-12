@@ -26,25 +26,31 @@
 <script src="~/Scripts/jquery-1.10.2.js"></script>
 <script>
 	function submitStrainForPriceSearch(strainId) {
-		var strainId = $("#strainQuery").val();
-		var type = $("input:radio[name=budType]:checked").val();
+		var strainId = $('#strainQuery').val();
+		var type = $('input:radio[name=budType]:checked').val();
 		var results;
-		$.getJSON("/ProductList/AveragePrice/" + strainId + "/" + type, function (data) {
-			console.log("success");
+		var dateAndPrice = [];
+		var items = [];
+		var quantityType;
+		$.getJSON('/ProductList/AveragePrice/' + strainId + '/' + type, function (data) {
+			console.log('success');
 			//console.log(data);
 			$('#results-raw').append(JSON.stringify(data));
-			var items = [];
 			$.each(data, function (key, val) {
 				$.each(val, function (key, val) {
-					$.each(val, function (key, val) {
-						items.push("<li>" + key + ": " + val + "</li>");
-					});
+					quantityType = val.quantity;
+					dateAndPrice.push('<ul>');
+					dateAndPrice.push('<li>Date: ' + val.date + '</li>');
+					dateAndPrice.push('<li>Price: ' + val.price + '</li>');
+					dateAndPrice.push('</ul><br>');
 				});
+				items.push('<strong>' + quantityType + '</strong>');
+				items.push(dateAndPrice.join(''));
 			});
 
-			results = $("<ul/>", {
-				"class": "my-new-list",
-				html: items.join("")
+			results = $('<ul/>', {
+				'class': 'my-new-list',
+				html: items.join('')
 			});
 			$('#results').html(results);
 		});
