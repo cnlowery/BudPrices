@@ -2,22 +2,24 @@
 	ViewBag.Title = "Index";
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+<link href="~/Styles/product-list.css" rel="stylesheet" />
 <form id="budSearch">
-	<div>
-		<h6>Search by Strain</h6>
-		<input id="strainQuery" type="text" name="strainQuery" placeholder="strain" /><br />
-		<input id="btnPriceSearch" type="submit" onclick="submitStrainForPriceSearch(strainQuery); return false;" value="find prices" /><br />
-		<input id="radioConcentrate" type="radio" name="budType" value="concentrates" />concentrate<br />
-		<input id="radioEdible" type="radio" name="budType" value="edibles" />edible<br />
-		<input id="radioFlower" type="radio" name="budType" value="flowers" />flower<br />
-		<input id="radioOther" type="radio" name="budType" value="other" />other<br />
-	</div>
-	<div>
+	<div class="clearfix form-group">
+		<h2>Search by Strain</h2>
+		<div class="search-input">
+			<input id="strainQuery" type="text" name="strainQuery" placeholder="strain" class="form-control" /><br />
+			<input id="btnPriceSearch" type="submit" onclick="submitStrainForPriceSearch(strainQuery); return false;" value="search" class="btn btn-block btn-default" />
+		</div>
+		<div class="bud-type">
+			<input id="radioFlower" type="radio" name="budType" value="flowers" checked /><label for="radioFlower">flower</label><br />
+			<input id="radioConcentrate" type="radio" name="budType" value="concentrates" /><label for="radioConcentrate">concentrate</label><br />
+			<input id="radioEdible" type="radio" name="budType" value="edibles" /><label for="radioEdible">edible</label><br />
+			<input id="radioOther" type="radio" name="budType" value="other" /><label for="radioOther">other</label><br />
+		</div>
 	</div>
 </form>
-<div id="results">
-
+<div class="loading"></div>
+<div id="results" class="results-container">
 </div>
 <div id="results-raw">
 
@@ -26,63 +28,130 @@
 <script src="~/Scripts/jquery-1.10.2.js"></script>
 <script src="~/Scripts/chart.min.js"></script>
 <script>
+	$(document).ready(function () {
+		$('input.form-control').focus(function () {
+			$(this).select();
+		});
+	});
 	function submitStrainForPriceSearch(strainId) {
 		var strainId = $('#strainQuery').val();
 		var type = $('input:radio[name=budType]:checked').val();
 		var results;
-		var dateAndPrice = [];
-		var items = [];
-		var quantityType;
-		var date;
-		var price;
 		var chart;
 		var chartData;
 		var chartDates = [];
-		var chartPrices = [];
+		var chartMode = [];
+		var chartAverage = [];
+		var chartLowest = [];
+		var chartHighest = [];
 		var ctx;
+		//reset results
+		$('#results').html('');
+		$('.loading').show();
+		//get data, build charts
 		$.getJSON('/ProductList/AveragePrice/' + strainId + '/' + type, function (data) {
 			console.log('success');
 			//console.log(data);
-			$('#results-raw').append(JSON.stringify(data));
+			//$('#results-raw').append(JSON.stringify(data));
 			$.each(data, function (key, val) {
 				$.each(val, function (key, val) {
-					quantityType = val.quantity;
-					dateAndPrice.push('<ul>');
-					dateAndPrice.push('<li>Date: ' + val.date + '</li>');
-					dateAndPrice.push('<li>Price: ' + val.price + '</li>');
-					dateAndPrice.push('</ul><br>');
 					chartDates.push(val.date);
-					chartPrices.push(val.price);
+					chartMode.push(val.mode);
+					chartAverage.push(val.average);
+					chartLowest.push(val.lowest);
+					chartHighest.push(val.highest);
 				});
-				items.push('<strong>' + quantityType + '</strong>');
-				items.push(dateAndPrice.join(''));
-				$('#results').append('<h3>' + quantityType + '</h3><canvas id="' + quantityType + '" width="800" height="400"></canvas>');
-				ctx = $('#' + quantityType).get(0).getContext("2d");
+				$('.loading').hide();
+				$('#results').append('<div class="tab ' + val[0].quantity + '"><a class="tab-label">' + quantityView(val[0].quantity) + '</a><div class="chart"><canvas id="' + val[0].quantity + '" width="800" height="400"></canvas></div></div>');
+				ctx = $('#' + val[0].quantity).get(0).getContext("2d");
 				chartData = {
 					labels: chartDates,
 					datasets: [
 						{
-							label: "My First dataset",
-							fillColor: "rgba(220,220,220,0.2)",
-							strokeColor: "rgba(220,220,220,1)",
-							pointColor: "rgba(220,220,220,1)",
+							label: "Average",
+							fillColor: "rgba(0,73,14,0.2)",
+							strokeColor: "rgba(0,73,14,1)",
+							pointColor: "rgba(0,73,14,1)",
 							pointStrokeColor: "#fff",
 							pointHighlightFill: "#fff",
-							pointHighlightStroke: "rgba(220,220,220,1)",
-							data: chartPrices
+							pointHighlightStroke: "rgba(0,73,14,1)",
+							data: chartAverage
+						},
+						{
+							label: "Most Common Price",
+							fillColor: "rgba(255,242,24,0.2)",
+							strokeColor: "rgba(255,242,24,1)",
+							pointColor: "rgba(255,242,24,1)",
+							pointStrokeColor: "#fff",
+							pointHighlightFill: "#fff",
+							pointHighlightStroke: "rgba(255,242,24,1)",
+							data: chartMode
+						},
+						{
+							label: "Lowest",
+							fillColor: "rgba(0,0,0,0.2)",
+							strokeColor: "rgba(0,0,0,1)",
+							pointColor: "rgba(0,0,0,1)",
+							pointStrokeColor: "#fff",
+							pointHighlightFill: "#fff",
+							pointHighlightStroke: "rgba(0,0,0,1)",
+							data: chartLowest
+						},
+						{
+							label: "Highest",
+							fillColor: "rgba(50,50,50,0.2)",
+							strokeColor: "rgba(50,50,50,1)",
+							pointColor: "rgba(50,50,50,1)",
+							pointStrokeColor: "#fff",
+							pointHighlightFill: "#fff",
+							pointHighlightStroke: "rgba(50,50,50,1)",
+							data: chartHighest
 						}
 					]
 				};
 				chart = new Chart(ctx).Line(chartData);
 				chartDates = [];
-				chartPrices = [];
+				chartMode = [];
+				chartAverage = [];
+				chartLowest = [];
+				chartHighest = [];
+				$('.tab.quarter') ? $('.tab.quarter').addClass('active') : $('.tab:first-child').addClass('active');				
+				$('.tab').click(function () {
+					$('.active').removeClass('active');
+					$(this).addClass('active');
 			});
-
-			results = $('<ul/>', {
-				'class': 'my-new-list',
-				html: items.join('')
 			});
-			$('#results').append(results);
+			if ($('.tab').length == 0) {
+				$('#results').html('<div class="no-results alert alert-info">Unable to find strain, please try your search again. Good luck!</div>');
+				$('.loading').hide();
+			}
 		});
+	}
+	function quantityView (value) {
+		switch (value) {
+			case "halfGram":
+				return "½ gram";
+				break;
+			case "gram":
+				return "1 gram";
+				break;
+			case "twoGram":
+				return "2 grams";
+				break;
+			case "eighth":
+				return "⅛ ounce";
+				break;
+			case "quarter":
+				return "¼ ounce";
+				break;
+			case "half":
+				return "½ ounce";
+				break;
+			case "ounce":
+				return "1 ounce";
+				break;
+			default:
+				return value;
+		}
 	}
 </script>

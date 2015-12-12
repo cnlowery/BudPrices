@@ -1,0 +1,47 @@
+﻿.tab {
+	display: inline-block;
+	padding: 10px;
+	height: 500px;
+}
+.tab a.tab-label {
+	color: #333;
+	cursor: pointer;
+}
+.tab a.tab-label:hover {
+	text-decoration: none;
+}
+.chart {
+	visibility: hidden;
+	position: absolute;
+	left: 10px;
+}
+.tab.active a.tab-label {
+	color: #004812;
+	text-decoration: underline;
+}
+.tab.active .chart {
+	visibility: visible;
+}
+.results-container {
+	position: relative;
+	margin-top: 30px;
+}
+.loading {
+	display: none;
+	width: 93px;
+	height: 192px;
+	background-image: url("/Images/loading.gif");
+	background-size: contain;
+}
+.bud-type, .search-input {
+	float: left;
+	margin-right: 1.5em;
+}
+.bud-type label {
+	text-transform: capitalize;
+	margin-left: 1.5em;
+	line-height: 1em;
+}
+.bud-type input[type="radio"] {
+	position: absolute;
+}
