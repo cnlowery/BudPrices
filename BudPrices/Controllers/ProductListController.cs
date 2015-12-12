@@ -26,26 +26,26 @@ namespace BudPrices.Controllers
 			if (type == "concentrates")
 			{
 				IEnumerable<Products> concentratePrices = GenerateListOfPrices(id, type);
-				List<List<Product>> modeConcentrate = GeneratePriceMode(concentratePrices);
-				data = modeConcentrate;
+				List<List<Product>> productListListConcentrate = GenerateProductListList(concentratePrices);
+				data = productListListConcentrate;
 			}	// if
 			else if (type == "edibles")
 			{
 				IEnumerable<Products> ediblePrices = GenerateListOfPrices(id, type);
-				List<List<Product>> modeEdible = GeneratePriceMode(ediblePrices);
-				data = modeEdible;
+				List<List<Product>> productListListEdible = GenerateProductListList(ediblePrices);
+				data = productListListEdible;
 			}	// else if
 			else if (type == "flowers")
 			{
 				IEnumerable<Products> flowerPrices = GenerateListOfPrices(id, type);
-				List<List<Product>> modeFlower = GeneratePriceMode(flowerPrices);
-				data = modeFlower;
+				List<List<Product>> productListListFlower = GenerateProductListList(flowerPrices);
+				data = productListListFlower;
 			}	// else if
 			else if (type == "other")
 			{
 				IEnumerable<Products> otherPrices = GenerateListOfPrices(id, type);
-				List<List<Product>> modeOther = GeneratePriceMode(otherPrices);
-				data = modeOther;
+				List<List<Product>> productListListOther = GenerateProductListList(otherPrices);
+				data = productListListOther;
 			}	// else if
 
 			var json = JsonConvert.SerializeObject(data);
@@ -151,9 +151,9 @@ namespace BudPrices.Controllers
 			return dateAndAveragePriceList;
 		}   // CalculateModeByQuantity(List<KeyValuePair<string, double>>)
 
-		public List<List<Product>> GeneratePriceMode(IEnumerable<Products> allPrices)
+		public List<List<Product>> GenerateProductListList(IEnumerable<Products> allPrices)
 		{
-			List<List<Product>> modePrices = new List<List<Product>>();
+			List<List<Product>> productListList = new List<List<Product>>();
 
 			List<KeyValuePair<string, double>> halfGramPrices = new List<KeyValuePair<string, double>>();
 			List<KeyValuePair<string, double>> gramPrices = new List<KeyValuePair<string, double>>();
@@ -203,52 +203,52 @@ namespace BudPrices.Controllers
 			{
 				List<Product> solution = new List<Product>();
 				solution = CreateProductList(halfGramPrices, "halfGram");
-				modePrices.Add(solution);
+				productListList.Add(solution);
 			}   // if
 
 			if (gramPrices.Count != 0)
 			{
 				List<Product> solution = new List<Product>();
 				solution = CreateProductList(gramPrices, "gram");
-				modePrices.Add(solution);
+				productListList.Add(solution);
 			}   // if
 
 			if (twoGramPrices.Count != 0)
 			{
 				List<Product> solution = new List<Product>();
 				solution = CreateProductList(twoGramPrices, "twoGram");
-				modePrices.Add(solution);
+				productListList.Add(solution);
 			}   // if
 
 			if (eighthPrices.Count != 0)
 			{
 				List<Product> solution = new List<Product>();
 				solution = CreateProductList(eighthPrices, "eighth");
-				modePrices.Add(solution);
+				productListList.Add(solution);
 			}   // if
 
 			if (quarterPrices.Count != 0)
 			{
 				List<Product> solution = new List<Product>();
 				solution = CreateProductList(quarterPrices, "quarter");
-				modePrices.Add(solution);
+				productListList.Add(solution);
 			}   // if
 
 			if (halfPrices.Count != 0)
 			{
 				List<Product> solution = new List<Product>();
 				solution = CreateProductList(halfPrices, "half");
-				modePrices.Add(solution);
+				productListList.Add(solution);
 			}   // if
 
 			if (ouncePrices.Count != 0)
 			{
 				List<Product> solution = new List<Product>();
 				solution = CreateProductList(ouncePrices, "ounce");
-				modePrices.Add(solution);
+				productListList.Add(solution);
 			}	// if
 
-			return modePrices;
+			return productListList;
 		}   // GeneratePriceMode(IEnumerable<Products>)
 
 		public List<Product> CreateProductList(List<KeyValuePair<string, double>> priceList, string listName)
@@ -262,7 +262,7 @@ namespace BudPrices.Controllers
 			for (int i = 0; i < mode.Count(); i++)
 			{
 				solution.Add(new Product(listName, mode[i].Key, mode[i].Value, average, lowest, highest));
-			}
+			}	// for
 			return solution;
 		}   // CreateListOfModes(List<KeyValuePair<string, double>>, string)
 	}
