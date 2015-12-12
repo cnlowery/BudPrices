@@ -12,12 +12,10 @@ namespace BudPrices.Controllers
 {
     public class ProductListController : Controller
     {
-
-		// GET: ProductList
 		public ActionResult Index()
 		{
 			return View();
-		}
+		}   // Index()
 
 		[HttpGet]
 		[ActionName("AveragePrice")]
@@ -30,30 +28,29 @@ namespace BudPrices.Controllers
 				IEnumerable<Products> concentratePrices = GenerateListOfPrices(id, type);
 				List<List<Product>> modeConcentrate = GeneratePriceMode(concentratePrices);
 				data = modeConcentrate;
-			}
+			}	// if
 			else if (type == "edible")
 			{
 				IEnumerable<Products> ediblePrices = GenerateListOfPrices(id, type);
 				List<List<Product>> modeEdible = GeneratePriceMode(ediblePrices);
 				data = modeEdible;
-			}
+			}	// else if
 			else if (type == "flower")
 			{
 				IEnumerable<Products> flowerPrices = GenerateListOfPrices(id, type);
 				List<List<Product>> modeFlower = GeneratePriceMode(flowerPrices);
 				data = modeFlower;
-			}
+			}	// else if
 			else if (type == "other")
 			{
 				IEnumerable<Products> otherPrices = GenerateListOfPrices(id, type);
 				List<List<Product>> modeOther = GeneratePriceMode(otherPrices);
 				data = modeOther;
-			}
+			}	// else if
 
-			//var jsonSerialiser = new JavaScriptSerializer();
 			var json = JsonConvert.SerializeObject(data);
 			return json;
-		}
+		}   // ReturnPriceMode(string, string)
 
 		public IEnumerable<Products> GenerateListOfPrices(string id, string type)
 		{
@@ -69,26 +66,26 @@ namespace BudPrices.Controllers
 			{
 				concentrateArray = Directory.GetFiles(@"c:\WeedPrices\concentrates\");
                 xmlArray = concentrateArray;
-			}
+			}	// if
 			else if (type == "edible")
 			{
 				edibleArray = Directory.GetFiles(@"c:\WeedPrices\edibles\");
                 xmlArray = edibleArray;
-			}
+			}	// else if
 			else if (type == "flower")
 			{
 				flowerArray = Directory.GetFiles(@"c:\WeedPrices\flowers\");
 				xmlArray = flowerArray;
-			}
+			}	// else if
 			else if (type == "other")
 			{
 				otherArray = Directory.GetFiles(@"c:\WeedPrices\other\");
 				xmlArray = otherArray;
-			}
+			}	// else if
 			else
 			{
 				return null;
-			}
+			}	// else
 
 			foreach (var xml in xmlArray)
 			{
@@ -97,7 +94,7 @@ namespace BudPrices.Controllers
 					XmlDocument layoutXml = new XmlDocument();
 					layoutXml.Load(xml);
 					StringReader sr = new StringReader(layoutXml.DocumentElement.OuterXml);
-					DataSet ds = new DataSet();//Using dataset to read xml file  
+					DataSet ds = new DataSet();
 					ds.ReadXml(sr);
 
 					// trim the last 12-4 digits from each file name for the date
@@ -110,7 +107,7 @@ namespace BudPrices.Controllers
 						products = (from rows in ds.Tables[0].AsEnumerable()
 									select new Products
 									{
-										Strain = rows[0].ToString().ToLower(), //Convert row to int  
+										Strain = rows[0].ToString().ToLower(), 
 										Price = rows[1].ToString(),
 										Quantity = rows[2].ToString(),
 										Date = date,
@@ -131,15 +128,14 @@ namespace BudPrices.Controllers
 				}   // catch
 			}   // foreach
 			return prices;
-		}
+		}   // GenerateListOfPrices(string, string)
 
 		public List<KeyValuePair<string, double>> CalculateModeByQuantity(List<KeyValuePair<string, double>> priceList)
 		{
+			Dictionary<string, double> dateAndAveragePriceDictionary = new Dictionary<string, double>();
 			List<string> dates = new List<string>();
 			List<double> prices = new List<double>();
 			double price;
-			Dictionary<string, double> dateAndAveragePriceDictionary = new Dictionary<string, double>();
-
 			var myList = priceList.OrderBy(d => d.Key);
 
 			foreach (var data in myList)
@@ -206,139 +202,97 @@ namespace BudPrices.Controllers
 				if (quantity == "1/2 Gram" || quantity == "Half Gram" || quantity == "HalfGram")
 				{
 					halfGramPrices.Add(new KeyValuePair<string, double>(entry.Date, priceInt));
-                }
+				}   // else if
 				else if (quantity == "Gram" || quantity == "1 Gram")
 				{
 					gramPrices.Add(new KeyValuePair<string, double>(entry.Date, priceInt));
-				}
+				}   // else if
 				else if (quantity == "2 Grams")
 				{
 					twoGramPrices.Add(new KeyValuePair<string, double>(entry.Date, priceInt));
-				}
+				}   // else if
 				else if (quantity == "Eighth")
 				{
 					eighthPrices.Add(new KeyValuePair<string, double>(entry.Date, priceInt));
-				}
+				}   // else if
 				else if (quantity == "Quarter")
 				{
 					quarterPrices.Add(new KeyValuePair<string, double>(entry.Date, priceInt));
-				}
+				}   // else if
 				else if (quantity == "Half")
 				{
 					halfPrices.Add(new KeyValuePair<string, double>(entry.Date, priceInt));
-				}
+				}   // else if
 				else if (quantity == "Ounce")
 				{
 					ouncePrices.Add(new KeyValuePair<string, double>(entry.Date, priceInt));
-				}
+				}	// else if
 			}   // foreach
 
 			if (halfGramPrices.Count != 0)
 			{
-				List<KeyValuePair<string, double>> answer = new List<KeyValuePair<string, double>>();
-				answer = CalculateModeByQuantity(halfGramPrices);
-
 				List<Product> solution = new List<Product>();
-
-				foreach (var item in answer)
-				{
-					solution.Add(new Product("halfGram", item.Key, item.Value));
-				}
-
+				solution = CreateListOfModes(halfGramPrices, "halfGram");
 				modePrices.Add(solution);
 			}   // if
 
 			if (gramPrices.Count != 0)
 			{
-				List<KeyValuePair<string, double>> answer = new List<KeyValuePair<string, double>>();
-				answer = CalculateModeByQuantity(gramPrices);
-
 				List<Product> solution = new List<Product>();
-
-				foreach (var item in answer)
-				{
-					solution.Add(new Product("gram", item.Key, item.Value));
-				}
-
+				solution = CreateListOfModes(gramPrices, "gram");
 				modePrices.Add(solution);
 			}   // if
 
 			if (twoGramPrices.Count != 0)
 			{
-				List<KeyValuePair<string, double>> answer = new List<KeyValuePair<string, double>>();
-				answer = CalculateModeByQuantity(twoGramPrices);
-
 				List<Product> solution = new List<Product>();
-
-				foreach (var item in answer)
-				{
-					solution.Add(new Product("twoGram", item.Key, item.Value));
-				}
-
+				solution = CreateListOfModes(twoGramPrices, "twoGram");
 				modePrices.Add(solution);
 			}   // if
 
 			if (eighthPrices.Count != 0)
 			{
-				List<KeyValuePair<string, double>> answer = new List<KeyValuePair<string, double>>();
-				answer = CalculateModeByQuantity(eighthPrices);
-
 				List<Product> solution = new List<Product>();
-
-				foreach (var item in answer)
-				{
-					solution.Add(new Product("eighth", item.Key, item.Value));
-				}
-
+				solution = CreateListOfModes(eighthPrices, "eighth");
 				modePrices.Add(solution);
 			}   // if
 
 			if (quarterPrices.Count != 0)
 			{
-				List<KeyValuePair<string, double>> answer = new List<KeyValuePair<string, double>>();
-				answer = CalculateModeByQuantity(quarterPrices);
-
 				List<Product> solution = new List<Product>();
-
-				foreach (var item in answer)
-				{
-					solution.Add(new Product("quarter", item.Key, item.Value));
-				}
-
+				solution = CreateListOfModes(quarterPrices, "quarter");
 				modePrices.Add(solution);
 			}   // if
 
 			if (halfPrices.Count != 0)
 			{
-				List<KeyValuePair<string, double>> answer = new List<KeyValuePair<string, double>>();
-				answer = CalculateModeByQuantity(halfPrices);
-
 				List<Product> solution = new List<Product>();
-
-				foreach (var item in answer)
-				{
-					solution.Add(new Product("half", item.Key, item.Value));
-				}
-
+				solution = CreateListOfModes(halfPrices, "half");
 				modePrices.Add(solution);
 			}   // if
 
 			if (ouncePrices.Count != 0)
 			{
-				List<KeyValuePair<string, double>> answer = new List<KeyValuePair<string, double>>();
-				answer = CalculateModeByQuantity(ouncePrices);
-
 				List<Product> solution = new List<Product>();
-
-				foreach (var item in answer)
-				{
-					solution.Add(new Product("ounce", item.Key, item.Value));
-				}
-
+				solution = CreateListOfModes(ouncePrices, "ounce");
 				modePrices.Add(solution);
 			}	// if
 
 			return modePrices;
 		}   // GeneratePriceMode(IEnumerable<Products>)
+
+		public List<Product> CreateListOfModes(List<KeyValuePair<string, double>> priceList, string listName)
+		{
+			List<KeyValuePair<string, double>> answer = new List<KeyValuePair<string, double>>();
+			List<Product> solution = new List<Product>();
+			answer = CalculateModeByQuantity(priceList);
+
+			foreach (var item in answer)
+			{
+				solution.Add(new Product(listName, item.Key, item.Value));
+			}   // foreach
+
+			return solution;
+		}   // CreateListOfModes(List<KeyValuePair<string, double>>, string)
 	}
 }
