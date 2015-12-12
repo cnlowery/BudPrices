@@ -19,23 +19,34 @@
 <div id="results">
 
 </div>
+<div id="results-raw">
+
+</div>
 
 <script src="~/Scripts/jquery-1.10.2.js"></script>
 <script>
 	function submitStrainForPriceSearch(strainId) {
 		var strainId = $("#strainQuery").val();
 		var type = $("input:radio[name=budType]:checked").val();
-		$.ajax({
-			url: "/ProductList/AveragePrice/" + strainId + "/" + type,
-			type: "GET",
-			dataType: 'text',
-			success: function (data) {
-				console.log("success");
-				console.log(data);
-				var results;
-				results += JSON.stringify(data);
-				$('#results').append(results);
-			}
-		})
+		var results;
+		$.getJSON("/ProductList/AveragePrice/" + strainId + "/" + type, function (data) {
+			console.log("success");
+			//console.log(data);
+			$('#results-raw').append(JSON.stringify(data));
+			var items = [];
+			$.each(data, function (key, val) {
+				$.each(val, function (key, val) {
+					$.each(val, function (key, val) {
+						items.push("<li>" + key + ": " + val + "</li>");
+					});
+				});
+			});
+
+			results = $("<ul/>", {
+				"class": "my-new-list",
+				html: items.join("")
+			});
+			$('#results').html(results);
+		});
 	}
 </script>
