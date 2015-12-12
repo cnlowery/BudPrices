@@ -261,7 +261,7 @@ namespace BudPrices.Controllers
 
 			for (int i = 0; i < mode.Count(); i++)
 			{
-				solution.Add(new Product(listName, mode[i].Key, mode[i].Value, average, lowest, highest));
+				solution.Add(new Product(mode[i].Key, listName, mode[i].Value, average, lowest, highest));
 			}	// for
 			return solution;
 		}   // CreateListOfModes(List<KeyValuePair<string, double>>, string)
