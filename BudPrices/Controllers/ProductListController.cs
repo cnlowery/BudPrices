@@ -139,7 +139,7 @@ namespace BudPrices.Controllers
 
 				if (!dateAndAveragePriceDictionary.ContainsKey(dates[i]))
 				{
-					dateAndAveragePriceDictionary.Add(dates[i], price);
+					dateAndAveragePriceDictionary.Add(dates[i], Math.Round(price, 2, MidpointRounding.AwayFromZero));
 				}   // if
 
 				if (whileCount != 0)
@@ -150,154 +150,6 @@ namespace BudPrices.Controllers
 			List<KeyValuePair<string, double>> dateAndAveragePriceList = dateAndAveragePriceDictionary.ToList();
 			return dateAndAveragePriceList;
 		}   // CalculateModeByQuantity(List<KeyValuePair<string, double>>)
-
-		public List<KeyValuePair<string, double>> CalculateAverageByQuantity(List<KeyValuePair<string, double>> priceList)
-		{
-			Dictionary<string, double> dateAndAveragePriceDictionary = new Dictionary<string, double>();
-			List<string> dates = new List<string>();
-			List<double> prices = new List<double>();
-			double price;
-			var myList = priceList.OrderBy(d => d.Key);
-
-			foreach (var data in myList)
-			{
-				dates.Add(data.Key);
-				prices.Add(data.Value);
-			}   // foreach
-
-			for (int i = 0; i < dates.Count(); i++)
-			{
-				List<double> pricesOnASpecificDayForASpecificProduct = new List<double>();
-				int j = i;
-				int whileCount = 0;
-				while (dates[i] == dates[j])
-				{
-					pricesOnASpecificDayForASpecificProduct.Add(prices[j]);
-					if (dates.Count() > (j + 1))
-					{
-						j++;
-					}   // if
-					else
-					{
-						break;
-					}   // else
-					whileCount++;
-				}   // while
-				price = prices.Average();
-
-				if (!dateAndAveragePriceDictionary.ContainsKey(dates[i]))
-				{
-					dateAndAveragePriceDictionary.Add(dates[i], price);
-				}   // if
-
-				if (whileCount != 0)
-				{
-					i = i + (whileCount - 1);
-				}   // if
-			}	// for
-
-			List<KeyValuePair<string, double>> dateAndAveragePriceList = dateAndAveragePriceDictionary.ToList();
-			return dateAndAveragePriceList;
-		}
-
-		public List<KeyValuePair<string, double>> CalculateLowestPriceByQuantity(List<KeyValuePair<string, double>> priceList)
-		{
-			Dictionary<string, double> dateAndAveragePriceDictionary = new Dictionary<string, double>();
-			List<string> dates = new List<string>();
-			List<double> prices = new List<double>();
-			double price;
-			var myList = priceList.OrderBy(d => d.Key);
-
-			foreach (var data in myList)
-			{
-				dates.Add(data.Key);
-				prices.Add(data.Value);
-			}   // foreach
-
-			for (int i = 0; i < dates.Count(); i++)
-			{
-				List<double> pricesOnASpecificDayForASpecificProduct = new List<double>();
-				int j = i;
-				int whileCount = 0;
-				while (dates[i] == dates[j])
-				{
-					pricesOnASpecificDayForASpecificProduct.Add(prices[j]);
-					if (dates.Count() > (j + 1))
-					{
-						j++;
-					}   // if
-					else
-					{
-						break;
-					}   // else
-					whileCount++;
-				}   // while
-				price = prices.Min();
-
-				if (!dateAndAveragePriceDictionary.ContainsKey(dates[i]))
-				{
-					dateAndAveragePriceDictionary.Add(dates[i], price);
-				}   // if
-
-				if (whileCount != 0)
-				{
-					i = i + (whileCount - 1);
-				}   // if
-			}   // for
-
-			List<KeyValuePair<string, double>> dateAndAveragePriceList = dateAndAveragePriceDictionary.ToList();
-			return dateAndAveragePriceList;
-		}
-
-		public List<KeyValuePair<string, double>> CalculateHighestPriceByQuantity(List<KeyValuePair<string, double>> priceList)
-		{
-			Dictionary<string, double> dateAndAveragePriceDictionary = new Dictionary<string, double>();
-			List<string> dates = new List<string>();
-			List<double> prices = new List<double>();
-			double price;
-			var myList = priceList.OrderBy(d => d.Key);
-
-			foreach (var data in myList)
-			{
-				dates.Add(data.Key);
-				prices.Add(data.Value);
-			}   // foreach
-
-			for (int i = 0; i < dates.Count(); i++)
-			{
-				List<double> pricesOnASpecificDayForASpecificProduct = new List<double>();
-				int j = i;
-				int whileCount = 0;
-				while (dates[i] == dates[j])
-				{
-					pricesOnASpecificDayForASpecificProduct.Add(prices[j]);
-					if (dates.Count() > (j + 1))
-					{
-						j++;
-					}   // if
-					else
-					{
-						break;
-					}   // else
-					whileCount++;
-				}   // while
-				price = prices.Max();
-
-				if (!dateAndAveragePriceDictionary.ContainsKey(dates[i]))
-				{
-					dateAndAveragePriceDictionary.Add(dates[i], price);
-				}   // if
-
-				if (whileCount != 0)
-				{
-					i = i + (whileCount - 1);
-				}   // if
-			}   // for
-
-			List<KeyValuePair<string, double>> dateAndAveragePriceList = dateAndAveragePriceDictionary.ToList();
-			return dateAndAveragePriceList;
-		}
-
 
 		public List<List<Product>> GeneratePriceMode(IEnumerable<Products> allPrices)
 		{
@@ -350,77 +202,67 @@ namespace BudPrices.Controllers
 			if (halfGramPrices.Count != 0)
 			{
 				List<Product> solution = new List<Product>();
-				solution = CreateListOfModes(halfGramPrices, "halfGram");
+				solution = CreateProductList(halfGramPrices, "halfGram");
 				modePrices.Add(solution);
 			}   // if
 
 			if (gramPrices.Count != 0)
 			{
 				List<Product> solution = new List<Product>();
-				solution = CreateListOfModes(gramPrices, "gram");
+				solution = CreateProductList(gramPrices, "gram");
 				modePrices.Add(solution);
 			}   // if
 
 			if (twoGramPrices.Count != 0)
 			{
 				List<Product> solution = new List<Product>();
-				solution = CreateListOfModes(twoGramPrices, "twoGram");
+				solution = CreateProductList(twoGramPrices, "twoGram");
 				modePrices.Add(solution);
 			}   // if
 
 			if (eighthPrices.Count != 0)
 			{
 				List<Product> solution = new List<Product>();
-				solution = CreateListOfModes(eighthPrices, "eighth");
+				solution = CreateProductList(eighthPrices, "eighth");
 				modePrices.Add(solution);
 			}   // if
 
 			if (quarterPrices.Count != 0)
 			{
 				List<Product> solution = new List<Product>();
-				solution = CreateListOfModes(quarterPrices, "quarter");
+				solution = CreateProductList(quarterPrices, "quarter");
 				modePrices.Add(solution);
 			}   // if
 
 			if (halfPrices.Count != 0)
 			{
 				List<Product> solution = new List<Product>();
-				solution = CreateListOfModes(halfPrices, "half");
+				solution = CreateProductList(halfPrices, "half");
 				modePrices.Add(solution);
 			}   // if
 
 			if (ouncePrices.Count != 0)
 			{
 				List<Product> solution = new List<Product>();
-				solution = CreateListOfModes(ouncePrices, "ounce");
+				solution = CreateProductList(ouncePrices, "ounce");
 				modePrices.Add(solution);
 			}	// if
 
 			return modePrices;
 		}   // GeneratePriceMode(IEnumerable<Products>)
 
-		public List<Product> CreateListOfModes(List<KeyValuePair<string, double>> priceList, string listName)
+		public List<Product> CreateProductList(List<KeyValuePair<string, double>> priceList, string listName)
 		{
-			List<KeyValuePair<string, double>> mode = new List<KeyValuePair<string, double>>();
-			List<KeyValuePair<string, double>> average = new List<KeyValuePair<string, double>>();
-			List<KeyValuePair<string, double>> lowest = new List<KeyValuePair<string, double>>();
-			List<KeyValuePair<string, double>> highest = new List<KeyValuePair<string, double>>();
 			List<Product> solution = new List<Product>();
-			mode = CalculateModeByQuantity(priceList);
-			average = CalculateAverageByQuantity(priceList);
-			lowest = CalculateLowestPriceByQuantity(priceList);
-			highest = CalculateHighestPriceByQuantity(priceList);
+			List<KeyValuePair<string, double>> mode = new List<KeyValuePair<string, double>>(CalculateModeByQuantity(priceList));
+			double average = Math.Round(priceList.Average(x => x.Value), 2, MidpointRounding.AwayFromZero);
+			double lowest = Math.Round(priceList.OrderBy(x => x.Value).First().Value, 2, MidpointRounding.AwayFromZero);
+			double highest = Math.Round(priceList.OrderBy(x => x.Value).Last().Value, 2, MidpointRounding.AwayFromZero);
 
 			for (int i = 0; i < mode.Count(); i++)
 			{
-				solution.Add(new Product(listName, mode[i].Key, mode[i].Value, average[i].Value, lowest[i].Value, highest[i].Value));
+				solution.Add(new Product(listName, mode[i].Key, mode[i].Value, average, lowest, highest));
 			}
-
-			//foreach (var item in mode)
-			//{
-			//	solution.Add(new Product(listName, item.Key, item.Value));
-			//}   // foreach
-
 			return solution;
 		}   // CreateListOfModes(List<KeyValuePair<string, double>>, string)
 	}
