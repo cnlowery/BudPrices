@@ -62,10 +62,11 @@
 					chartHighest.push(val.highest);
 				});
 				$('.loading').hide();
-				$('#results').append('<div class="tab ' + val[0].quantity + '"><a class="tab-label">' + quantityView(val[0].quantity) + '</a><div class="chart"><canvas id="' + val[0].quantity + '" width="800" height="400"></canvas></div></div>');
+				$('#results').append('<div class="tab ' + val[0].quantity + '"><a class="tab-label">' + quantityView(val[0].quantity) + '</a><div class="chart"><canvas id="' + val[0].quantity + '" width="800" height="400"></canvas><div id="' + val[0].quantity + '-legend" class="chart-legend"></div></div></div>');
 				ctx = $('#' + val[0].quantity).get(0).getContext("2d");
 				chartData = {
 					labels: chartDates,
+					bezierCurve: false,
 					datasets: [
 						{
 							label: "Average",
@@ -110,16 +111,18 @@
 					]
 				};
 				chart = new Chart(ctx).Line(chartData);
+				$('#' + val[0].quantity + '-legend').html(chart.generateLegend())
 				chartDates = [];
 				chartMode = [];
 				chartAverage = [];
 				chartLowest = [];
 				chartHighest = [];
-				$('.tab.quarter') ? $('.tab.quarter').addClass('active') : $('.tab:first-child').addClass('active');				
+				// if quarter is available, have that be the active tab, else have the first tab be active
+				$('.tab.quarter') ? $('.tab.quarter').addClass('active') : $('.tab:first-child').addClass('active');
 				$('.tab').click(function () {
 					$('.active').removeClass('active');
 					$(this).addClass('active');
-			});
+				});
 			});
 			if ($('.tab').length == 0) {
 				$('#results').html('<div class="no-results alert alert-info">Unable to find strain, please try your search again. Good luck!</div>');
