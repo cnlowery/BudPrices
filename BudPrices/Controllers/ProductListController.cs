@@ -251,7 +251,7 @@ namespace BudPrices.Controllers
 			return productListList;
 		}   // GeneratePriceMode(IEnumerable<Products>)
 
-		public List<Product> CreateProductList(List<KeyValuePair<string, double>> priceList, string listName)
+		public List<Product> CreateProductList(List<KeyValuePair<string, double>> priceList, string quantity)
 		{
 			List<Product> solution = new List<Product>();
 			List<KeyValuePair<string, double>> mode = new List<KeyValuePair<string, double>>(CalculateModeByQuantity(priceList));
@@ -261,7 +261,7 @@ namespace BudPrices.Controllers
 
 			for (int i = 0; i < mode.Count(); i++)
 			{
-				solution.Add(new Product(mode[i].Key, listName, mode[i].Value, average, lowest, highest));
+				solution.Add(new Product(mode[i].Key, quantity, mode[i].Value, average, lowest, highest));
 			}	// for
 			return solution;
 		}   // CreateListOfModes(List<KeyValuePair<string, double>>, string)
