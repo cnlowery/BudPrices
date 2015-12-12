@@ -24,6 +24,7 @@
 </div>
 
 <script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/chart.min.js"></script>
 <script>
 	function submitStrainForPriceSearch(strainId) {
 		var strainId = $('#strainQuery').val();
@@ -32,6 +33,13 @@
 		var dateAndPrice = [];
 		var items = [];
 		var quantityType;
+		var date;
+		var price;
+		var chart;
+		var chartData;
+		var chartDates = [];
+		var chartPrices = [];
+		var ctx;
 		$.getJSON('/ProductList/AveragePrice/' + strainId + '/' + type, function (data) {
 			console.log('success');
 			//console.log(data);
@@ -43,16 +51,38 @@
 					dateAndPrice.push('<li>Date: ' + val.date + '</li>');
 					dateAndPrice.push('<li>Price: ' + val.price + '</li>');
 					dateAndPrice.push('</ul><br>');
+					chartDates.push(val.date);
+					chartPrices.push(val.price);
 				});
 				items.push('<strong>' + quantityType + '</strong>');
 				items.push(dateAndPrice.join(''));
+				$('#results').append('<h3>' + quantityType + '</h3><canvas id="' + quantityType + '" width="800" height="400"></canvas>');
+				ctx = $('#' + quantityType).get(0).getContext("2d");
+				chartData = {
+					labels: chartDates,
+					datasets: [
+						{
+							label: "My First dataset",
+							fillColor: "rgba(220,220,220,0.2)",
+							strokeColor: "rgba(220,220,220,1)",
+							pointColor: "rgba(220,220,220,1)",
+							pointStrokeColor: "#fff",
+							pointHighlightFill: "#fff",
+							pointHighlightStroke: "rgba(220,220,220,1)",
+							data: chartPrices
+						}
+					]
+				};
+				chart = new Chart(ctx).Line(chartData);
+				chartDates = [];
+				chartPrices = [];
 			});
 
 			results = $('<ul/>', {
 				'class': 'my-new-list',
 				html: items.join('')
 			});
-			$('#results').html(results);
+			$('#results').append(results);
 		});
 	}
 </script>
