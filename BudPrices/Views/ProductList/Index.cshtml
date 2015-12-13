@@ -21,116 +21,124 @@
 <div class="loading"></div>
 <div id="results" class="results-container">
 </div>
-<div id="results-raw">
-
-</div>
-
+<div class="clearfix"></div>
 <script src="~/Scripts/jquery-1.10.2.js"></script>
 <script src="~/Scripts/chart.min.js"></script>
 <script>
 	$(document).ready(function () {
-		$('input.form-control').focus(function () {
+		$('input[type="text"].form-control').focus(function () {
 			$(this).select();
 		});
 	});
 	function submitStrainForPriceSearch(strainId) {
 		var strainId = $('#strainQuery').val();
 		var type = $('input:radio[name=budType]:checked').val();
-		var results;
+		var ctx;
 		var chart;
 		var chartData;
-		var chartDates = [];
-		var chartMode = [];
-		var chartAverage = [];
-		var chartLowest = [];
-		var chartHighest = [];
-		var ctx;
 		//reset results
 		$('#results').html('');
 		$('.loading').show();
 		//get data, build charts
 		$.getJSON('/ProductList/AveragePrice/' + strainId + '/' + type, function (data) {
-			console.log('success');
-			//console.log(data);
-			//$('#results-raw').append(JSON.stringify(data));
 			$.each(data, function (key, val) {
+				//sort data
+				var datesArray = [], modesArray = [], averagesArray = [], lowestsArray = [], highestsArray = [];
+				var latestData;
 				$.each(val, function (key, val) {
-					chartDates.push(val.date);
-					chartMode.push(val.mode);
-					chartAverage.push(val.average);
-					chartLowest.push(val.lowest);
-					chartHighest.push(val.highest);
+					datesArray.push(val.date);
+					modesArray.push(val.mode);
+					averagesArray.push(val.average);
+					lowestsArray.push(val.lowest);
+					highestsArray.push(val.highest);
 				});
+				latestData = {
+					date: val[val.length - 1].date,
+					mode: val[val.length - 1].mode,
+					average: val[val.length - 1].average,
+					lowest: val[val.length - 1].lowest,
+					highest: val[val.length - 1].highest
+				}
+				//hide loading animation, show results
 				$('.loading').hide();
-				$('#results').append('<div class="tab ' + val[0].quantity + '"><a class="tab-label">' + quantityView(val[0].quantity) + '</a><div class="chart"><canvas id="' + val[0].quantity + '" width="800" height="400"></canvas><div id="' + val[0].quantity + '-legend" class="chart-legend"></div></div></div>');
-				ctx = $('#' + val[0].quantity).get(0).getContext("2d");
-				chartData = {
-					labels: chartDates,
-					bezierCurve: false,
-					datasets: [
-						{
-							label: "Average",
-							fillColor: "rgba(0,73,14,0.2)",
-							strokeColor: "rgba(0,73,14,1)",
-							pointColor: "rgba(0,73,14,1)",
-							pointStrokeColor: "#fff",
-							pointHighlightFill: "#fff",
-							pointHighlightStroke: "rgba(0,73,14,1)",
-							data: chartAverage
-						},
-						{
-							label: "Most Common Price",
-							fillColor: "rgba(255,242,24,0.2)",
-							strokeColor: "rgba(255,242,24,1)",
-							pointColor: "rgba(255,242,24,1)",
-							pointStrokeColor: "#fff",
-							pointHighlightFill: "#fff",
-							pointHighlightStroke: "rgba(255,242,24,1)",
-							data: chartMode
-						},
-						{
-							label: "Lowest",
-							fillColor: "rgba(0,0,0,0.2)",
-							strokeColor: "rgba(0,0,0,1)",
-							pointColor: "rgba(0,0,0,1)",
-							pointStrokeColor: "#fff",
-							pointHighlightFill: "#fff",
-							pointHighlightStroke: "rgba(0,0,0,1)",
-							data: chartLowest
-						},
-						{
-							label: "Highest",
-							fillColor: "rgba(50,50,50,0.2)",
-							strokeColor: "rgba(50,50,50,1)",
-							pointColor: "rgba(50,50,50,1)",
-							pointStrokeColor: "#fff",
-							pointHighlightFill: "#fff",
-							pointHighlightStroke: "rgba(50,50,50,1)",
-							data: chartHighest
-						}
-					]
-				};
-				chart = new Chart(ctx).Line(chartData);
-				$('#' + val[0].quantity + '-legend').html(chart.generateLegend())
-				chartDates = [];
-				chartMode = [];
-				chartAverage = [];
-				chartLowest = [];
-				chartHighest = [];
-				// if quarter is available, have that be the active tab, else have the first tab be active
-				$('.tab.quarter') ? $('.tab.quarter').addClass('active') : $('.tab:first-child').addClass('active');
-				$('.tab').click(function () {
+				$('#results').append('<div class="tab ' + val[0].quantity + '"><a class="tab-label">' + quantityView(val[0].quantity) + '</a></div>');
+				$('.tab.' + val[0].quantity).click(function () {
+					$('.active .chart').remove();
 					$('.active').removeClass('active');
 					$(this).addClass('active');
+					$('.tab.' + val[0].quantity).append('<div class="chart"><canvas id="' + val[0].quantity + '" width="800" height="400"></canvas></div>');
+					$('.chart').append('<div id="' + val[0].quantity + '-legend" class="chart-legend"></div>');
+					$('.chart').append('<div class="latest-data"></div>');
+					$('.latest-data').append('<div class="highest">Highest Price: $' + latestData.highest + '</div>');
+					$('.latest-data').append('<div class="mode">Most Common Price: $' + latestData.mode + '</div>');
+					$('.latest-data').append('<div class="average">Average Price: $' + latestData.average + '</div>');
+					$('.latest-data').append('<div class="lowest">Lowest Price: $' + latestData.lowest + '</div>');
+					$('.latest-data').append('<div class="date">Last updated: ' + latestData.date + '</div>');
+					ctx = $('#' + val[0].quantity).get(0).getContext("2d");
+					chartData = {
+						labels: datesArray,
+						datasets: [
+							{
+								label: "Average",
+								fillColor: "rgba(0,73,14,0.2)",
+								strokeColor: "rgba(0,73,14,1)",
+								pointColor: "rgba(0,73,14,1)",
+								pointStrokeColor: "#fff",
+								pointHighlightFill: "#fff",
+								pointHighlightStroke: "rgba(0,73,14,1)",
+								data: averagesArray
+							},
+							{
+								label: "Most Common Price",
+								fillColor: "rgba(255,242,24,0.2)",
+								strokeColor: "rgba(255,242,24,1)",
+								pointColor: "rgba(255,242,24,1)",
+								pointStrokeColor: "#fff",
+								pointHighlightFill: "#fff",
+								pointHighlightStroke: "rgba(255,242,24,1)",
+								data: modesArray
+							},
+							{
+								label: "Lowest",
+								fillColor: "rgba(0,0,0,1)",
+								strokeColor: "rgba(0,0,0,1)",
+								pointColor: "rgba(0,0,0,1)",
+								pointStrokeColor: "#fff",
+								pointHighlightFill: "#fff",
+								pointHighlightStroke: "rgba(0,0,0,1)",
+								data: lowestsArray
+							},
+							{
+								label: "Highest",
+								fillColor: "rgba(50,50,50,0.2)",
+								strokeColor: "rgba(50,50,50,1)",
+								pointColor: "rgba(50,50,50,1)",
+								pointStrokeColor: "#fff",
+								pointHighlightFill: "#fff",
+								pointHighlightStroke: "rgba(50,50,50,1)",
+								data: highestsArray
+							}
+						]
+					};
+					chart = new Chart(ctx).Line(chartData, {
+						bezierCurve: false,
+						responsive: true,
+						maintainAspectRatio: true
+					});
+					$('#' + val[0].quantity + '-legend').html(chart.generateLegend());
 				});
-			});
+			}); //each(data)
+			// if quarter is available, have that be the active tab, else have the first tab be active
+			$('.tab.quarter') ? $('.tab.quarter').click() : $('.tab:first-child').click();
+			// if no results
 			if ($('.tab').length == 0) {
 				$('#results').html('<div class="no-results alert alert-info">Unable to find strain, please try your search again. Good luck!</div>');
 				$('.loading').hide();
 			}
-		});
-	}
-	function quantityView (value) {
+		});//getJSON
+	} //submitStrainForPriceSearch()
+	function quantityView(value) {
+		//makes pretty strings out of ugly ids
 		switch (value) {
 			case "halfGram":
 				return "½ gram";
@@ -156,5 +164,5 @@
 			default:
 				return value;
 		}
-	}
+	} //quantityView()
 </script>
