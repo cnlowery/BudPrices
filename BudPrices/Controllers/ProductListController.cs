@@ -7,11 +7,14 @@ using System.IO;
 using System.Data;
 using Newtonsoft.Json;
 using BudPrices.Models;
+using System.Configuration;
 
 namespace BudPrices.Controllers
 {
-    public class ProductListController : Controller
+	public class ProductListController : Controller
     {
+		string pricesDir = ConfigurationManager.AppSettings["pricesDir"];
+
 		public ActionResult Index()
 		{
 			return View();
@@ -55,7 +58,7 @@ namespace BudPrices.Controllers
 		public IEnumerable<Products> GenerateListOfPrices(string id, string type)
 		{
 			List<Products> prices = new List<Products>();
-			string[] xmlArray = Directory.GetFiles($@"c:\WeedPrices\{type}\");
+			string[] xmlArray = Directory.GetFiles($@"{pricesDir}{type}\");
 
 			foreach (var xml in xmlArray)
 			{
